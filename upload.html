@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Resume</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: url('{{ url_for('static', filename='mat.webp') }}');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 50px; /* Space for footer or bottom margin */
+        }
+
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content-wrapper">
+        <div class="container">
+            <h2 class="text-center mb-4">Upload Your Resume</h2>
+            <form id="resume-form" enctype="multipart/form-data" class="mb-3">
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="resume-file" name="resume" accept=".pdf" onchange="toggleUploadButton()">
+                    <label class="custom-file-label" for="resume-file">Choose resume...</label>
+                </div>
+                <button type="button" id="upload-btn" class="btn btn-primary mt-3" onclick="uploadResume()" disabled>Upload Resume</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        function toggleUploadButton() {
+            const resumeFile = document.getElementById("resume-file").files[0];
+            document.getElementById("upload-btn").disabled = !resumeFile;
+        }
+
+        function uploadResume() {
+            const resumeFile = document.getElementById("resume-file").files[0];
+            const formData = new FormData();
+            formData.append("resume", resumeFile);
+
+            fetch("/upload_resume", {
+                method: "POST",
+                body: formData,
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    window.location.href = "/chatbot";
+                }
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+                alert("An error occurred while uploading the resume.");
+            });
+        }
+    </script>
+</body>
+
+</html>
